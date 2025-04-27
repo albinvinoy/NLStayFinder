@@ -6,16 +6,15 @@ from flask import Flask, render_template, request, jsonify
 import uvicorn
 from dotenv import load_dotenv
 
-from app.core.config import settings
-from app.api.routes import api_router
-from app.nlp.processor import NLPProcessor
-
-# Load environment variables
-load_dotenv()
+# Load environment variables (optional)
+try:
+    load_dotenv()
+except Exception:
+    pass  # Continue even if .env is not found
 
 # Initialize FastAPI
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title="NLStayFinder",
     description="NLP-based apartment finder application",
     version="0.1.0",
     docs_url="/api/docs",
@@ -26,14 +25,11 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*"],  # Allow all origins for local testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Include API routes
-app.include_router(api_router, prefix=settings.API_PREFIX)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -53,13 +49,21 @@ def search():
     if not query:
         return jsonify({"error": "No query provided"}), 400
     
-    # Process the NLP query
-    nlp_processor = NLPProcessor()
-    results = nlp_processor.process_query(query)
+    # Return mock data (no real processing)
+    mock_results = {
+        "query": query,
+        "parameters": {
+            "city": "San Francisco",
+            "min_bedrooms": 1,
+            "max_price": 3000
+        },
+        "results": [],
+        "count": 0
+    }
     
-    return jsonify(results)
+    return jsonify(mock_results)
 
 if __name__ == "__main__":
-    # Run FastAPI with uvicorn
+    # Run Flask app directly for simplicity
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True) 
+    flask_app.run(host="0.0.0.0", port=port, debug=True) 
