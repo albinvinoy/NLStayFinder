@@ -1,9 +1,12 @@
 # Core Framework
-fastapi==0.103.1
-uvicorn==0.23.2
 flask==2.3.3
 jinja2==3.1.2
+python-dotenv==1.0.0
+
+# Needed for API compatibility
+fastapi==0.103.1
 pydantic==2.3.0
+uvicorn==0.23.2
 
 # Database
 sqlalchemy==2.0.20
@@ -22,7 +25,6 @@ beautifulsoup4==4.12.2
 requests==2.31.0
 selenium==4.12.0
 scrapy==2.10.0
-python-dotenv==1.0.0
 
 # Cloud & Deployment
 boto3==1.28.40
