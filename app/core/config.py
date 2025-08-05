@@ -1,6 +1,7 @@
 import os
-from typing import List, Union
-from pydantic import BaseSettings, AnyHttpUrl, validator
+from typing import List, Union, Dict, Any
+from pydantic_settings import BaseSettings
+from pydantic import AnyHttpUrl, validator
 
 class Settings(BaseSettings):
     # Project settings
@@ -18,21 +19,29 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
     
-    # Database settings
+    # Database settings - SQLite for development
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./nlstayfinder.db")
+    SQLALCHEMY_DATABASE_URI: str = DATABASE_URL
+    
+    # PostgreSQL settings (for future production deployment)
     POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "nlstayfinder")
-    SQLALCHEMY_DATABASE_URI: str = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
+    
+    @property
+    def is_sqlite(self) -> bool:
+        """Check if using SQLite database"""
+        return self.SQLALCHEMY_DATABASE_URI.startswith("sqlite")
     
     # Scraper settings
-    SCRAPER_INTERVAL_HOURS: int = int(os.getenv("SCRAPER_INTERVAL_HOURS", 24))
+    SCRAPER_INTERVAL_HOURS: int = int(os.getenv("SCRAPER_INTERVAL_HOURS", "24"))
     SCRAPER_URLS: List[str] = [
         "https://www.zillow.com/homes/for_rent/"
     ]
     
     # Zillow robots.txt rules to follow
-    ZILLOW_ROBOTS_RULES = {
+    ZILLOW_ROBOTS_RULES: Dict[str, Any] = {
         "allowed_paths": [
             "/homes/for_rent/",
             "/homes/for_sale/",
