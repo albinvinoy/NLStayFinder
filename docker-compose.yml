@@ -5,39 +5,10 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_SERVER=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=nlstayfinder
-      - SCRAPER_INTERVAL_HOURS=24
     volumes:
       - .:/app
-    depends_on:
-      - db
     command: >
-      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-
-  db:
-    image: postgres:13
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      sh -c "python -m flask --app app.main:flask_app run --host=0.0.0.0 --port=8000"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=nlstayfinder
-    ports:
-      - "5432:5432"
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-
-volumes:
-  postgres_data: 
+      - FLASK_DEBUG=1
+      - FLASK_ENV=development
